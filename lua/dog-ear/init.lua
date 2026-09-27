@@ -43,15 +43,20 @@ end
 
 local function flash(buf, start_line, end_line)
   -- One mark per line. A shared end row is inclusive and paints the line below.
+  -- Delete only these ids so a second flash does not wipe the first.
+  local marks = {}
   for line = start_line, end_line do
-    vim.api.nvim_buf_set_extmark(buf, ns, line - 1, 0, {
+    marks[#marks + 1] = vim.api.nvim_buf_set_extmark(buf, ns, line - 1, 0, {
       line_hl_group = "Dog-EarFlash",
       priority = vim.hl.priorities.user,
     })
   end
   vim.defer_fn(function()
-    if vim.api.nvim_buf_is_valid(buf) then
-      vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+    if not vim.api.nvim_buf_is_valid(buf) then
+      return
+    end
+    for _, id in ipairs(marks) do
+      vim.api.nvim_buf_del_extmark(buf, ns, id)
     end
   end, 400)
 end
