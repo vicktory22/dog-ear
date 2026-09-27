@@ -50,7 +50,7 @@ vim.pack.add({ "https://github.com/vicktory22/dog-ear" })
 +--------------------------------------------------+
 ```
 
-`plugin/dog-ear.lua` calls `require("dog-ear").setup()`, which loads `lua/dog-ear/init.lua` and maps `<leader>lr` in visual mode.
+`plugin/dog-ear.lua` calls `require("dog-ear").setup()`, which loads `lua/dog-ear/init.lua` and maps `<leader>lr` in visual mode. Set `vim.g.dog_ear` before that load to change it: `{ keymap = "<leader>de" }` uses another key, and `{ keymap = false }` maps nothing. Set `vim.g.loaded_dog_ear = true` first if you will call `setup` yourself. Calling `setup` again replaces the previous Dog-Ear mapping.
 
 ```
 +-------------------- [ LOAD ] --------------------+

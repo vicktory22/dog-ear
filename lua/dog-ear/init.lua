@@ -125,13 +125,35 @@ function M.copy_visual()
   end)
 end
 
-function M.setup()
+local mapped
+
+function M.setup(opts)
+  opts = opts or {}
   define_hl()
   vim.api.nvim_create_autocmd("ColorScheme", {
     group = vim.api.nvim_create_augroup("dog-ear", { clear = true }),
     callback = define_hl,
   })
-  vim.keymap.set("x", "<leader>lr", M.copy_visual, { desc = "Copy filename and line numbers" })
+
+  if mapped then
+    pcall(vim.keymap.del, "x", mapped)
+    mapped = nil
+  end
+
+  local lhs = opts.keymap
+  if lhs == false then
+    return
+  end
+  if type(lhs) ~= "string" or lhs == "" then
+    lhs = "<leader>lr"
+  end
+
+  vim.keymap.set("x", lhs, M.copy_visual, {
+    desc = "Copy filename and line numbers",
+    silent = true,
+    remap = false,
+  })
+  mapped = lhs
 end
 
 return M
