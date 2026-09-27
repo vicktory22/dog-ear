@@ -37,8 +37,11 @@ local function copy(text)
   return ok and vim.fn.getreg("+") == text
 end
 
+local function define_hl()
+  vim.api.nvim_set_hl(0, "Dog-EarFlash", { bg = "#1f7a32", fg = "#f0fff0", default = true })
+end
+
 local function flash(buf, start_line, end_line)
-  vim.api.nvim_set_hl(0, "Dog-EarFlash", { bg = "#1f7a32", fg = "#f0fff0" })
   -- One mark per line. A shared end row is inclusive and paints the line below.
   for line = start_line, end_line do
     vim.api.nvim_buf_set_extmark(buf, ns, line - 1, 0, {
@@ -118,6 +121,11 @@ function M.copy_visual()
 end
 
 function M.setup()
+  define_hl()
+  vim.api.nvim_create_autocmd("ColorScheme", {
+    group = vim.api.nvim_create_augroup("dog-ear", { clear = true }),
+    callback = define_hl,
+  })
   vim.keymap.set("x", "<leader>lr", M.copy_visual, { desc = "Copy filename and line numbers" })
 end
 
