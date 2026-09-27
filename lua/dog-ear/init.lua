@@ -15,22 +15,20 @@ local function file_path()
     return nil
   end
 
-  local git_root = vim.trim(vim.fn.system({ "git", "rev-parse", "--show-toplevel" }))
-  if vim.v.shell_error == 0 and git_root ~= "" then
-    return vim.fn.fnamemodify(abs_path, ":s?" .. git_root .. "/??")
+  local dir = vim.fn.fnamemodify(abs_path, ":h")
+  local git_root = vim.fs.root(dir, ".git")
+  if not git_root then
+    return vim.fn.fnamemodify(abs_path, ":t")
   end
-  return vim.fn.expand("%:t")
+
+  local rel = vim.fs.relpath(git_root, abs_path)
+  if not rel or rel == "." then
+    return vim.fn.fnamemodify(abs_path, ":t")
+  end
+  return rel
 end
 
 local function copy(text)
-  if vim.fn.executable("wl-copy") == 1 then
-    local job = vim.fn.jobstart({ "wl-copy" }, { stdin = "pipe" })
-    if job > 0 then
-      vim.fn.chansend(job, text)
-      vim.fn.chanclose(job, "stdin")
-      return true
-    end
-  end
   vim.fn.setreg("+", text)
   return vim.fn.getreg("+") == text
 end
