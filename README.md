@@ -1,6 +1,6 @@
 # Dog-Ear
 
-Dog-Ear copies a location you can hand to an agent. Select one or more lines in Neovim and it puts the file and those line numbers on the system clipboard, then flashes the lines green so you can see what was copied.
+Dog-Ear copies a location you can hand to an agent. Select one or more lines in Neovim and it puts the file path and those line numbers on the system clipboard, then flashes the lines green so you can see what was copied.
 
 ```
 +-------------------- [ USE ] ---------------------+
@@ -22,10 +22,10 @@ It does not copy the code. The agent gets a place to open, which keeps the chat 
 
 Needs Neovim 0.11 or newer, and a clipboard Neovim can write to. Add the repo, restart Neovim, and the mapping is already there. No setup call is required.
 
-Neovim 0.12, in `init.lua`:
+Neovim 0.12, in `init.lua`. During startup, `vim.pack.add` skips `plugin/` unless `load` is true:
 
 ```lua
-vim.pack.add({ "https://github.com/vicktory22/dog-ear" })
+vim.pack.add({ "https://github.com/vicktory22/dog-ear" }, { load = true })
 ```
 
 lazy.nvim:
@@ -36,22 +36,18 @@ lazy.nvim:
 
 Any other plugin manager works the same way. Add `https://github.com/vicktory22/dog-ear` and let it load `plugin/`.
 
-Open a file that has a name on disk. Select the lines you want the agent to read, press `<leader>lr`, and paste into the chat.
+Open a named file. Select the lines you want the agent to read, press `<leader>lr`, and paste into the chat. The clipboard gets only the location: one line, or a range, not both.
 
 ```
 +------------------- [ OUTPUT ] -------------------+
 |                                                  |
-| key       <leader>lr                             |
-| mode      visual                                 |
 | one line  file.lua:12                            |
-| range     file.lua:12-18                         |
-| path      relative to cwd, else absolute         |
-| flash     the whole line, green                  |
+| or range  file.lua:12-18                         |
 |                                                  |
 +--------------------------------------------------+
 ```
 
-A single line uses one number. A selection that spans lines uses a range. The path is relative to the current working directory, or absolute when the file is not under that directory. The flash covers each selected line, then clears, and Dog-Ear leaves visual mode.
+A single line uses one number. A selection that spans lines uses a range. The path is relative to the current working directory, or absolute when the file is not under that directory. Dog-Ear then leaves visual mode and flashes each selected line. The flash is the whole line, green, and then it clears.
 
 ## Change the key
 
