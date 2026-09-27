@@ -14,18 +14,8 @@ local function file_path()
   if abs_path == "" then
     return nil
   end
-
-  local dir = vim.fn.fnamemodify(abs_path, ":h")
-  local git_root = vim.fs.root(dir, ".git")
-  if not git_root then
-    return vim.fn.fnamemodify(abs_path, ":t")
-  end
-
-  local rel = vim.fs.relpath(git_root, abs_path)
-  if not rel or rel == "." then
-    return vim.fn.fnamemodify(abs_path, ":t")
-  end
-  return rel
+  -- :. is relative to cwd when the file is under it, otherwise absolute.
+  return vim.fn.fnamemodify(abs_path, ":.")
 end
 
 local function copy(text)

@@ -21,13 +21,13 @@ It does not copy the code itself. The agent gets a place to open, which keeps th
 | mode      visual                                 |
 | one line  file.lua:12                            |
 | range     file.lua:12-18                         |
-| path      relative to the git root               |
+| path      relative to cwd, else absolute         |
 | flash     the whole line, green                  |
 |                                                  |
 +--------------------------------------------------+
 ```
 
-Inside a git repository the path is relative to the repository root. Outside a repository it is only the filename. A single line uses one number. A selection that spans lines uses a range.
+The path is relative to the current working directory, or absolute when the file is not under that directory. A single line uses one number. A selection that spans lines uses a range.
 
 ## Install
 
