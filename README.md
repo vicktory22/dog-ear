@@ -28,3 +28,11 @@ It does not copy the code itself. The agent gets a place to open, which keeps th
 ```
 
 Inside a git repository the path is relative to the repository root. Outside a repository it is only the filename. A single line uses one number. A selection that spans lines uses a range.
+
+## Install
+
+```lua
+vim.pack.add({ "https://github.com/vicktory22/dog-ear" })
+```
+
+Loading the plugin maps `<leader>lr` in visual mode.
