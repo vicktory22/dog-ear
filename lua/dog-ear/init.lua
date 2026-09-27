@@ -29,8 +29,12 @@ local function file_path()
 end
 
 local function copy(text)
-  vim.fn.setreg("+", text)
-  return vim.fn.getreg("+") == text
+  -- Without a clipboard provider, "+" is only an internal register.
+  if vim.fn.has("clipboard") ~= 1 then
+    return false
+  end
+  local ok = pcall(vim.fn.setreg, "+", text)
+  return ok and vim.fn.getreg("+") == text
 end
 
 local function flash(buf, start_line, end_line)
