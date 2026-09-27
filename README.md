@@ -1,3 +1,5 @@
+# Dog-Ear
+
 Dog-Ear copies a location you can hand to an agent. Select one or more lines in Neovim and it puts the file and those line numbers on the system clipboard, then flashes the lines green so you can see what was copied.
 
 ```
@@ -12,7 +14,29 @@ Dog-Ear copies a location you can hand to an agent. Select one or more lines in 
 +--------------------------------------------------+
 ```
 
-It does not copy the code itself. The agent gets a place to open, which keeps the chat short and points at the current file instead of a stale paste.
+It does not copy the code. The agent gets a place to open, which keeps the chat short and points at the current file instead of a stale paste. What you paste looks like `lua/dog-ear/init.lua:91-108`.
+
+`<leader>` is your leader key: `\` unless you set `mapleader`, and space in a lot of configs. Press that key, then `l`, then `r`, while the lines are still selected. The mapping exists only in visual mode.
+
+## Install
+
+Needs Neovim 0.11 or newer, and a clipboard Neovim can write to. Add the repo, restart Neovim, and the mapping is already there. No setup call is required.
+
+Neovim 0.12, in `init.lua`:
+
+```lua
+vim.pack.add({ "https://github.com/vicktory22/dog-ear" })
+```
+
+lazy.nvim:
+
+```lua
+{ "vicktory22/dog-ear" }
+```
+
+Any other plugin manager works the same way. Add `https://github.com/vicktory22/dog-ear` and let it load `plugin/`.
+
+Open a file that has a name on disk. Select the lines you want the agent to read, press `<leader>lr`, and paste into the chat.
 
 ```
 +------------------- [ OUTPUT ] -------------------+
@@ -27,41 +51,37 @@ It does not copy the code itself. The agent gets a place to open, which keeps th
 +--------------------------------------------------+
 ```
 
-The path is relative to the current working directory, or absolute when the file is not under that directory. A single line uses one number. A selection that spans lines uses a range.
+A single line uses one number. A selection that spans lines uses a range. The path is relative to the current working directory, or absolute when the file is not under that directory. The flash covers each selected line, then clears, and Dog-Ear leaves visual mode.
 
-## Install
+## Change the key
+
+The only mapping is `<leader>lr`. To pick different keys, set `keymap` to that string before the plugin loads. `false` maps nothing.
 
 ```lua
-vim.pack.add({ "https://github.com/vicktory22/dog-ear" })
+vim.g.dog_ear = { keymap = "<leader>lr" }
 ```
 
-`vim.pack` clones the repo and adds it with `:packadd`. These two files are enough. No `doc/`, license, or `pkg.json` is required.
+Set `vim.g.loaded_dog_ear = true` first if you will call `setup` yourself. Calling `setup` again replaces the previous mapping.
 
-```
-+------------------- [ FILES ] --------------------+
-|                                                  |
-| dog-ear                                          |
-| ├─ plugin                                        |
-| │  └─ dog-ear.lua  sourced on load               |
-| └─ lua                                           |
-|    └─ dog-ear                                    |
-|       └─ init.lua  require("dog-ear")            |
-|                                                  |
-+--------------------------------------------------+
+```lua
+vim.g.loaded_dog_ear = true
+
+require("dog-ear").setup({ keymap = "<leader>lr" })
 ```
 
-`plugin/dog-ear.lua` calls `require("dog-ear").setup()`, which loads `lua/dog-ear/init.lua` and maps `<leader>lr` in visual mode. Set `vim.g.dog_ear` before that load to change it: `{ keymap = "<leader>de" }` uses another key, and `{ keymap = false }` maps nothing. Set `vim.g.loaded_dog_ear = true` first if you will call `setup` yourself. Calling `setup` again replaces the previous Dog-Ear mapping.
+With lazy.nvim, pass the same table as `opts`. Lazy calls `setup` after the plugin loads:
 
-```
-+-------------------- [ LOAD ] --------------------+
-|                                                  |
-| ●  vim.pack clones the repo                      |
-| │                                                |
-| ●  packadd sources plugin/dog-ear.lua            |
-| │                                                |
-| ○  setup maps <leader>lr                         |
-|                                                  |
-+--------------------------------------------------+
+```lua
+{
+  "vicktory22/dog-ear",
+  opts = { keymap = "<leader>lr" },
+}
 ```
 
-If that `add()` call is in `init.lua`, Neovim waits until startup finishes before sourcing `plugin/`. The mapping is still set before you use it.
+The flash uses the `Dog-EarFlash` highlight. Set that group from your colorscheme if you want a different color.
+
+## If paste does nothing
+
+Dog-Ear writes the `+` register. Another app only sees that when Neovim has a clipboard provider. Run `:checkhealth` and look at the clipboard report. On Linux, install `xclip`, `xsel`, or `wl-clipboard` when that check fails.
+
+Nothing is copied, and the lines do not flash, when the selection is empty, the buffer has no filename, or the clipboard write fails. Dog-Ear shows a message instead.
